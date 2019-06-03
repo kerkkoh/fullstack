@@ -1,0 +1,19 @@
+note over selain:
+Käyttäjä kirjoittaa tekstikenttään jotain
+ja painaa nappia tallenna.
+end note
+note over selain:
+Selain suorittaa lomakkeeseen liittyvää
+Javascriptiä, joka lisää listaan käyttäjän syöttämän
+lomakkeen arvon DOM-apin avulla HTML:lään ja lähettää
+palvelimelle POST-kyselyn, joka sisältää lomakkeen arvon
+ja aikaleiman merkkijonoksi muunnettuna JSON datana.
+end note
+selain->palvelin: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+note over palvelin:
+Palvelin parsii ja sitten tallentaa
+POST-kyselyn antaman JSON-olion muistiin
+siten, että se ja muut muistiinpanot lähetetään
+/data.json osoitteeseen kohdistetuissa GET-kyselyssä.
+end note
+palvelin->selain: 201 Created

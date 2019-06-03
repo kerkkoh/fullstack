@@ -1,0 +1,40 @@
+note over selain:
+Käyttäjä kirjoittaa tekstikenttään jotain
+ja painaa nappia tallenna.
+Selain suorittaa lomakkeen action attribuutin
+method attribuutin mukaisesti.
+end note
+selain->palvelin: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note
+note over palvelin:
+Palvelin tallentaa POST-kyselyn
+antaman "note":n muistiin siten, että se lähetetään
+/data.json osoitteeseen kohdistetussa GET-kyselyssä.
+end note
+note over palvelin:
+Palvelin vastaa kyselyyn uudelleenohjaus-käskyllä
+302 osoitteeseen "/notes".
+end note
+palvelin-->selain: 302 Found, Redirect /notes
+note over selain:
+Selain uudelleenohjautuu sivulle /notes
+eli pyytää GET-kyselyllä kyseistä sivua.
+end note
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+palvelin-->selain: HTML-koodi
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+palvelin-->selain: main.css
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+palvelin-->selain: main.js
+
+note over selain:
+Selain alkaa suorittaa js-koodia
+joka pyytää JSON-datan palvelimelta
+end note
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+palvelin-->selain: [{ content: "HTML on helppoa", date: "2019-01-01" }, ...]
+
+note over selain:
+Selain suorittaa tapahtumankäsittelijän
+joka renderöi muistiinpanot näytölle
+end note
