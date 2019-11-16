@@ -37,9 +37,14 @@ export const AddNew = ({persons, setPersons, newName, setNewName, newNbr, setNew
         setTimeout(() => setNotification(''), 5000)
       })
       .catch( e => {
-        setError(`Information of ${newName} has already been removed from server`)
-        setTimeout(() => setError(''), 5000)
-        setPersons(persons.filter(p => p.id !== existing.id))
+        if (e.response.data.msg !== undefined) {
+          setError(`${e.response.data.msg}`)
+          setTimeout(() => setError(''), 5000)
+        } else {
+          setError(`Information of ${newName} has already been removed from server`)
+          setTimeout(() => setError(''), 5000)
+          setPersons(persons.filter(p => p.id !== existing.id))
+        }
       })
     }
     } else {
@@ -49,7 +54,10 @@ export const AddNew = ({persons, setPersons, newName, setNewName, newNbr, setNew
       setNotification(`Added ${newName}`)
       setTimeout(() => setNotification(''), 5000)
       })
-      .catch(console.error)
+      .catch(e => {
+        setError(`${e.response.data.msg}`)
+        setTimeout(() => setError(''), 5000)
+      })
     }
   }
 
