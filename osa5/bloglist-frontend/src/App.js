@@ -2,68 +2,21 @@ import React, { useState, useEffect } from 'react'
 import loginService from './services/login'
 import blogsService from './services/blogs'
 import Togglable from './Togglable'
-import PropTypes from 'prop-types'
 import Blog from './components/Blog'
-
-const Notification = ({ notification, type }) => {
-  return (
-    <div className={`notif ${type}`}>
-      {notification}
-    </div>
-  )
-}
-
-Notification.propTypes = {
-  notification: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired
-}
-
-const BlogForm = ({
-  addBlog,
-  title,
-  setTitle,
-  author,
-  setAuthor,
-  url,
-  setUrl
-}) => {
-  return (
-    <div>
-      <h1>create new</h1>
-      <form onSubmit={addBlog}>
-        title:
-        <input type="name" value={title} name="Title"
-          onChange={({ target }) => setTitle(target.value)}/><br />
-        author:
-        <input type="name" value={author} name="Author"
-          onChange={({ target }) => setAuthor(target.value)}/><br />
-        url:
-        <input type="url" value={url} name="Url"
-          onChange={({ target }) => setUrl(target.value)}/><br />
-        <button type="submit">create</button>
-      </form>
-    </div>
-  )
-}
-BlogForm.propTypes = {
-  addBlog: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  setTitle: PropTypes.func.isRequired,
-  author: PropTypes.string.isRequired,
-  setAuthor: PropTypes.func.isRequired,
-  url: PropTypes.string.isRequired,
-  setUrl: PropTypes.func.isRequired,
-}
+import Notification from './components/Notification'
+import BlogForm from './components/BlogForm'
+import { useField, stripReset } from './hooks'
 
 function App() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const username = useField('username')
+  const password = useField('password')
 
-  const [ notification, setNotification ] = useState('')
-  const [ error, setError ] = useState('')
+  const title = useField('title')
+  const author = useField('author')
+  const url = useField('url')
+
+  const [notification, setNotification] = useState('')
+  const [error, setError] = useState('')
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
   const [expanded, setExpanded] = useState([])
@@ -86,19 +39,19 @@ function App() {
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({ username, password })
-
+      const user = await loginService.login({ username: username.value, password: password.value })
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       blogsService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      username.reset()
+      password.reset()
       setError('')
     } catch (exception) {
       setError('wrong username or password')
       setTimeout(() => {setError('')}, 5000)
     }
   }
+
   const loginForm = () => {
     return (
       <div>
@@ -106,21 +59,11 @@ function App() {
         <form onSubmit={handleLogin}>
           <div>
             username
-            <input
-              type="text"
-              value={username}
-              name="Username"
-              onChange={({ target }) => setUsername(target.value)}
-            />
+            <input {...stripReset(username)}/>
           </div>
           <div>
             password
-            <input
-              type="password"
-              value={password}
-              name="Password"
-              onChange={({ target }) => setPassword(target.value)}
-            />
+            <input {...stripReset(password)}/>
           </div>
           <button type="submit">login</button>
         </form>
@@ -168,11 +111,11 @@ function App() {
     event.preventDefault()
     blogFormRef.current.toggleVisibility()
     try {
-      const res = await blogsService.create({ title, author, url })
+      const res = await blogsService.create({ title: title.value, author: author.value, url: url.value })
       setBlogs([...blogs, res])
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      title.reset()
+      author.reset()
+      url.reset()
       setNotification(`a new blog ${res.title} by ${res.author} added`)
       setTimeout(() => {setNotification('')}, 5000)
     } catch (exception) {
@@ -185,11 +128,8 @@ function App() {
     <Togglable buttonLabel='new blog' ref={blogFormRef}>
       <BlogForm addBlog={addBlog}
         title={title}
-        setTitle={setTitle}
         author={author}
-        setAuthor={setAuthor}
-        url={url}
-        setUrl={setUrl}/>
+        url={url}/>
     </Togglable>
   )
 
