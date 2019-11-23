@@ -3,6 +3,7 @@ import loginService from './services/login'
 import blogsService from './services/blogs'
 import Togglable from './Togglable'
 import PropTypes from 'prop-types'
+import Blog from './components/Blog'
 
 const Notification = ({ notification, type }) => {
   return (
@@ -11,10 +12,12 @@ const Notification = ({ notification, type }) => {
     </div>
   )
 }
+
 Notification.propTypes = {
   notification: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired
 }
+
 const BlogForm = ({
   addBlog,
   title,
@@ -124,12 +127,14 @@ function App() {
       </div>
     )
   }
+
   const toggleBlog = (b) => {
     if (expanded.find(e => e === b.id))
       setExpanded(expanded.filter(e => e !== b.id))
     else
       setExpanded([...expanded, b.id])
   }
+
   const like = async (b) => {
     try {
       await blogsService.update(b.id, { likes: b.likes + 1 })
@@ -140,6 +145,7 @@ function App() {
       setTimeout(() => {setError('')}, 2000)
     }
   }
+
   const remove = async (b) => {
     try {
       if (window.confirm(`remove blog ${b.title} by ${b.author}`)) {
@@ -153,21 +159,11 @@ function App() {
   }
 
   const listBlogs = () => {
-    return blogs.sort((a,b) => b.likes-a.likes).map(b => {
-      if (expanded.find(e => e === b.id))
-        return (
-          <li key={b.id}>
-            <div onClick={() => toggleBlog(b)}>{b.title}, by {b.author}</div>
-            <a href={b.url}>{b.url}</a><br/>
-            {b.likes} likes <button onClick={() => like(b)}>like</button><br/>
-            added by {b.user.name}<br/>
-            {b.user.id === user.id ? <button onClick={() => remove(b)}>remove</button> : <div></div>}
-          </li>
-        )
-      else
-        return (<li onClick={() => toggleBlog(b)} key={b.id}>{b.title}, by {b.author}</li>)
-    })
+    return blogs.sort((a,b) => b.likes-a.likes).map(b =>
+      <Blog key={b.id} b={b} expanded={expanded.find(e => e === b.id)} toggleBlog={toggleBlog} like={like} remove={remove} user={user}/>
+    )
   }
+
   const addBlog = async (event) => {
     event.preventDefault()
     blogFormRef.current.toggleVisibility()
@@ -184,6 +180,7 @@ function App() {
       setTimeout(() => {setError('')}, 5000)
     }
   }
+
   const blogForm = () => (
     <Togglable buttonLabel='new blog' ref={blogFormRef}>
       <BlogForm addBlog={addBlog}
